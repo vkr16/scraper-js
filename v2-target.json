@@ -1,0 +1,99 @@
+[
+    {
+        "active": true,
+        "name": "Emas Antam",
+        "url": "https://www.logammulia.com/id/harga-emas-hari-ini",
+        "selectors": [
+            {
+                "key": "Harga Beli",
+                "selector": "body > section.section-padding.n-no-padding-top > div > div:nth-child(3) > div > div.grid-child.n-768-1per3.n-768-no-margin-bottom > table:nth-child(3) > tbody > tr:nth-child(4) > td:nth-child(2)",
+                "type": "integer",
+                "prompt": null
+            }
+        ]
+    },
+    {
+        "active": true,
+        "name": "Emas Antam",
+        "url": "https://www.logammulia.com/id/sell/gold",
+        "selectors": [
+            {
+                "key": "Harga Jual",
+                "selector": "body > section.section-padding.n-no-padding-bottom > div > div > div.grid-child.n-1200-2per3.n-no-margin-bottom > div > div > div.right > div > div:nth-child(1) > span.value > span.text",
+                "type": "integer",
+                "prompt": null
+            }
+        ]
+    },
+    {
+        "active": true,
+        "name": "Emas Pegadaian",
+        "url": "https://sahabat.pegadaian.co.id/harga-emas",
+        "selectors": [
+            {
+                "key": "Harga Beli",
+                "selector": "//html/body/div[1]/div/div[2]/main/div[2]/div[2]/div/div/div/div/div/div[1]/div/div[2]/div[2]/div/div/div[1]/div[2]/p[1]",
+                "type": "integer",
+                "prompt": null
+            },
+            {
+                "key": "Harga Jual",
+                "selector": "//html/body/div[1]/div/div[2]/main/div[2]/div[2]/div/div/div/div/div/div[1]/div/div[2]/div[2]/div/div/div[2]/div[2]/p[1]",
+                "type": "integer",
+                "prompt": null
+            }
+        ]
+    },
+    {
+        "active": true,
+        "name": "Trimegah Dana Tetap Syariah Kelas A",
+        "url": "https://bibit.id/reksadana/RD3480/trimegah-dana-tetap-syariah-kelas-a",
+        "selectors": [
+            {
+                "key": "Harga Beli",
+                "selector": "#__next > main > div > div > div:nth-child(1) > div > div > div:nth-child(2) > div > div.HeaderStlye_header-wrapper-value-left__Edsc3 > div:nth-child(2) > div.HeaderStlye_header-title-right-text-value__p3wlc",
+                "type": "float",
+                "prompt": "format it to 2 decimal place"
+            }
+        ]
+    },
+    {
+        "active": true,
+        "name": "ABF Indonesia Bond Index Fund",
+        "url": "https://bibit.id/reksadana/RD13/abf-indonesia-bond-index-fund",
+        "selectors": [
+            {
+                "key": "Harga Beli",
+                "selector": "#__next > main > div > div > div:nth-child(1) > div > div > div:nth-child(2) > div > div.HeaderStlye_header-wrapper-value-left__Edsc3 > div:nth-child(2) > div.HeaderStlye_header-title-right-text-value__p3wlc",
+                "type": "float",
+                "prompt": "format it to 2 decimal place"
+            }
+        ]
+    },
+    {
+        "active": true,
+        "name": "Majoris Pasar Uang Syariah Indonesia",
+        "url": "https://bibit.id/reksadana/RD832/majoris-pasar-uang-syariah-indonesia",
+        "selectors": [
+            {
+                "key": "Harga Beli",
+                "selector": "#__next > main > div > div > div:nth-child(1) > div > div > div:nth-child(2) > div > div.HeaderStlye_header-wrapper-value-left__Edsc3 > div:nth-child(2) > div.HeaderStlye_header-title-right-text-value__p3wlc",
+                "type": "float",
+                "prompt": "format it to 2 decimal place"
+            }
+        ]
+    },
+    {
+        "active": true,
+        "name": "TRIM Kas 2 Kelas A",
+        "url": "https://bibit.id/reksadana/RD1766/trim-kas-2-kelas-a",
+        "selectors": [
+            {
+                "key": "Harga Beli",
+                "selector": "#__next > main > div > div > div:nth-child(1) > div > div > div:nth-child(2) > div > div.HeaderStlye_header-wrapper-value-left__Edsc3 > div:nth-child(2) > div.HeaderStlye_header-title-right-text-value__p3wlc",
+                "type": "float",
+                "prompt": "format it to 2 decimal place"
+            }
+        ]
+    }
+]
