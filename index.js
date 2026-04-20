@@ -51,7 +51,6 @@ app.get('/scrape', async (req, res) => {
             error: err.code || "SCRAPE_FAILED",
         });
     }
-
 });
 
 app.listen(PORT, () => {
