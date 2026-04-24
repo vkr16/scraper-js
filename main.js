@@ -1,8 +1,52 @@
+const env = require('dotenv');
+env.config();
+
 const playwright = require('playwright');
 
-const HEADLESS = process.env.HEADLESS !== 'false';
+const express = require('express');
+const app = express();
 
-async function scrapeHtmlSection({ url, selectors }) {
+app.use(express.json());
+
+const PORT = 3000;
+const HEADLESS = false;
+
+app.get('/', (req, res) => {
+    res.json({ status: 'OK', app_version: '2.1.0', timestamp: new Date().toLocaleString() });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+app.get('/v2', async (req, res) => {
+    const { url, selectors = 'body' } = req.body || {};
+    if (!url) return res.status(400).json({ error: 'Missing URL' });
+
+    try {
+        const result = await loadPage({ url, selectors });
+        if (!result) {
+            throw new Error('No result found or the result is empty');
+        }
+
+        return res.json({
+            success: true,
+            error: null,
+            data: {
+                url,
+                result,
+                fetched_at: new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }).replace('T', ' ')
+            }
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            error: err.code || "SCRAPE_FAILED",
+        });
+    }
+});
+
+async function loadPage({ url, selectors }) {
     if (!url) throw new Error('url is required');
 
     const browser = await playwright.chromium.launch({ headless: HEADLESS, args: ['--no-sandbox'] });
@@ -39,11 +83,10 @@ async function scrapeHtmlSection({ url, selectors }) {
             try {
                 const elHandle = page.locator(selector);
                 const value = await elHandle.evaluate(node => node.innerHTML, undefined, { timeout: 30000 });
-                result.data.value = value;
+                result.data.value = parsePrice(value);
             } catch (error) {
                 result.success = false;
                 result.error = "SCRAPE_FAILED"
-                console.log(error)
             }
             results.push(result);
         }
@@ -56,68 +99,10 @@ async function scrapeHtmlSection({ url, selectors }) {
     }
 }
 
-async function scrapeHtmlSectionV3({ url, selector }) {
-    if (!url) throw new Error('url is required');
-    if (!selector) throw new Error('selector is required');
-
-    const browser = await playwright.chromium.launch({
-        headless: HEADLESS,
-        args: ['--no-sandbox']
-    });
-
-    const page = await browser.newPage();
-
-    try {
-        await page.addInitScript(() => {
-            Object.defineProperty(navigator, 'webdriver', {
-                get: () => undefined
-            });
-        });
-
-        await page.goto(url, {
-            waitUntil: 'domcontentloaded',
-            timeout: 0
-        });
-
-        const result = {
-            success: true,
-            error: null,
-            data: {
-                selector,
-                value: null
-            }
-        };
-
-        try {
-            const elHandle = page.locator(selector);
-            const value = await elHandle.evaluate(
-                node => node.innerHTML,
-                undefined,
-                { timeout: 30000 }
-            );
-            result.data.value = parsePrice(value);
-        } catch (error) {
-            result.success = false;
-            result.error = 'SCRAPE_FAILED';
-            console.log(error);
-        }
-
-        await browser.close();
-        return result;
-
-    } catch (err) {
-        try { await browser.close(); } catch (_) { }
-        throw err;
-    }
-}
-
 function parsePrice(value) {
     if (!value) return null;
-
-    // 1. Keep only digits, dot, comma
     let cleaned = value.replace(/[^0-9.,]/g, '');
 
-    // 2. If both comma and dot exist → detect decimal separator (last occurrence)
     const lastDot = cleaned.lastIndexOf('.');
     const lastComma = cleaned.lastIndexOf(',');
 
@@ -126,8 +111,6 @@ function parsePrice(value) {
     if (lastDot > -1 && lastComma > -1) {
         decimalSeparator = lastDot > lastComma ? '.' : ',';
     } else if (lastComma > -1) {
-        // If only comma → could be decimal OR thousand
-        // Assume decimal if it's not grouping every 3 digits
         const parts = cleaned.split(',');
         if (parts[parts.length - 1].length !== 3) {
             decimalSeparator = ',';
@@ -139,26 +122,18 @@ function parsePrice(value) {
         }
     }
 
-    // 3. Remove thousand separators
     let normalized = cleaned;
 
     if (decimalSeparator) {
         const regex = decimalSeparator === '.' ? /,/g : /\./g;
         normalized = normalized.replace(regex, '');
-
-        // Replace decimal separator with dot
         if (decimalSeparator === ',') {
             normalized = normalized.replace(',', '.');
         }
     } else {
-        // No decimal → remove all separators
         normalized = normalized.replace(/[.,]/g, '');
     }
 
-    // 4. Convert to number
     const result = Number(normalized);
-
     return isNaN(result) ? null : result;
 }
-
-module.exports = { scrapeHtmlSection, scrapeHtmlSectionV3 };
