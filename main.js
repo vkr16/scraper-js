@@ -1,5 +1,5 @@
-const env = require('dotenv');
-env.config();
+// const env = require('dotenv');
+// env.config();
 
 const playwright = require('playwright');
 
