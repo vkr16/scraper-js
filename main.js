@@ -10,6 +10,7 @@ app.use(express.json());
 
 const PORT = 3000;
 const HEADLESS = false;
+const LOG = true;
 
 app.get('/', (req, res) => {
     res.json({ status: 'OK', app_version: '2.1.0', timestamp: new Date().toLocaleString() });
@@ -39,6 +40,7 @@ app.get('/v2', async (req, res) => {
             }
         });
     } catch (err) {
+        if (LOG) console.log(err);
         return res.status(500).json({
             success: false,
             error: err.code || "SCRAPE_FAILED",
@@ -85,6 +87,7 @@ async function loadPage({ url, selectors }) {
                 const value = await elHandle.evaluate(node => node.innerHTML, undefined, { timeout: 30000 });
                 result.data.value = parsePrice(value);
             } catch (error) {
+                if (LOG) console.log(error);
                 result.success = false;
                 result.error = "SCRAPE_FAILED"
             }
@@ -94,6 +97,7 @@ async function loadPage({ url, selectors }) {
         await browser.close();
         return results;
     } catch (err) {
+        if (LOG) console.log(err);
         try { await browser.close(); } catch (_) { }
         throw err;
     }
