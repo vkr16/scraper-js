@@ -1,7 +1,7 @@
 // const env = require('dotenv');
 // env.config();
 
-const playwright = require('playwright');
+const { chromium } = require('playwright');
 
 const express = require('express');
 const app = express();
@@ -51,7 +51,11 @@ app.get('/v2', async (req, res) => {
 async function loadPage({ url, selectors }) {
     if (!url) throw new Error('url is required');
 
-    const browser = await playwright.chromium.launch({ headless: HEADLESS, args: ['--no-sandbox'] });
+    const browser = await chromium.launch({
+        headless: HEADLESS,
+        executablePath: '/usr/bin/chromium-browser',
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
     try {
