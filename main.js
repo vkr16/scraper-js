@@ -8,16 +8,16 @@ const app = express();
 
 app.use(express.json());
 
-const PORT = 3000;
+const PORT = 3030;
 const HEADLESS = false;
-const LOG = true;
+const LOG = false;
 
 app.get('/', (req, res) => {
     res.json({ status: 'OK', app_version: '2.1.0', timestamp: new Date().toLocaleString() });
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+   //  console.log(`Server is running on port ${PORT}`);
 });
 
 app.get('/v2', async (req, res) => {

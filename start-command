@@ -1,0 +1,1 @@
+pm2 start /usr/bin/bash --name scraper-js-with-xvfb -- -c "/usr/bin/xvfb-run --auto-servernum node main.js"
