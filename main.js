@@ -66,7 +66,7 @@ async function loadPage({ url, selector }) {
         await page.addInitScript(() => {
             Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
         });
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 0 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60 });
 
         const elHandle = page.locator(selector);
         const raw = await elHandle.evaluate(node => node.innerHTML, undefined, { timeout: 30000 });
