@@ -17,11 +17,12 @@ app.listen(PORT, () => {
 });
 
 app.get('/v2', async (req, res) => {
-    const { name, url, selector } = req.body || {};
+    const { name, key, url, selector } = req.body || {};
 
     if (!url) return res.status(400).json({ error: 'Missing URL' });
     if (!selector) return res.status(400).json({ error: 'Missing selector' });
     if (!name) return res.status(400).json({ error: 'Missing name' });
+    if (!key) return res.status(400).json({ error: 'Missing key' });
 
     try {
         const value = await loadPage({ url, selector });
@@ -36,6 +37,7 @@ app.get('/v2', async (req, res) => {
                 name,
                 url,
                 selector,
+                key,
                 value,
                 fetched_at: new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }).replace('T', ' ')
             }
