@@ -1,4 +1,8 @@
+// const env = require('dotenv');
+// env.config();
+
 const { chromium } = require('playwright');
+
 const express = require('express');
 const app = express();
 
@@ -9,24 +13,20 @@ const HEADLESS = false;
 const LOG = false;
 
 app.get('/', (req, res) => {
-    res.json({ status: 'OK', app_version: '2.2.0', timestamp: new Date().toLocaleString() });
+    res.json({ status: 'OK', app_version: '2.1.0', timestamp: new Date().toLocaleString() });
 });
 
 app.listen(PORT, () => {
-    // console.log(`Server is running on port ${PORT}`);
+   //  console.log(`Server is running on port ${PORT}`);
 });
 
 app.get('/v2', async (req, res) => {
-    const { name, url,  key, selector } = req.body || {};
-
+    const { url, selectors = 'body' } = req.body || {};
     if (!url) return res.status(400).json({ error: 'Missing URL' });
-    if (!selector) return res.status(400).json({ error: 'Missing selector' });
-    if (!name) return res.status(400).json({ error: 'Missing name' });
-    if (!key) return res.status(400).json({ error: 'Missing key' });
 
     try {
-        const value = await loadPage({ url, selector });
-        if (value === null || value === undefined) {
+        const result = await loadPage({ url, selectors });
+        if (!result) {
             throw new Error('No result found or the result is empty');
         }
 
@@ -34,11 +34,8 @@ app.get('/v2', async (req, res) => {
             success: true,
             error: null,
             data: {
-                name,
                 url,
-                selector,
-                key,
-                value,
+                result,
                 fetched_at: new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }).replace('T', ' ')
             }
         });
@@ -51,9 +48,8 @@ app.get('/v2', async (req, res) => {
     }
 });
 
-async function loadPage({ url, selector }) {
+async function loadPage({ url, selectors }) {
     if (!url) throw new Error('url is required');
-    if (!selector) throw new Error('selector is required');
 
     const browser = await chromium.launch({
         headless: HEADLESS,
@@ -66,14 +62,44 @@ async function loadPage({ url, selector }) {
         await page.addInitScript(() => {
             Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
         });
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-        const elHandle = page.locator(selector);
-        const raw = await elHandle.evaluate(node => node.innerHTML, undefined, { timeout: 30000 });
-        const value = parsePrice(raw);
+        if (!Array.isArray(selectors) || selectors.length === 0) {
+            await browser.close();
+            return {};
+        }
+
+        const results = [];
+        for (const item of selectors) {
+            const { key, selector } = item || {};
+
+            if (!key || !selector) {
+                continue;
+            }
+            let result = {
+                success: true,
+                error: null,
+                data: {
+                    key: key,
+                    selector: selector,
+                    value: null
+                }
+            };
+
+            try {
+                const elHandle = page.locator(selector);
+                const value = await elHandle.evaluate(node => node.innerHTML, undefined, { timeout: 30000 });
+                result.data.value = parsePrice(value);
+            } catch (error) {
+                if (LOG) console.log(error);
+                result.success = false;
+                result.error = "SCRAPE_FAILED"
+            }
+            results.push(result);
+        }
 
         await browser.close();
-        return value;
+        return results;
     } catch (err) {
         if (LOG) console.log(err);
         try { await browser.close(); } catch (_) { }
