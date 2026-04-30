@@ -62,7 +62,7 @@ async function loadPage({ url, selectors }) {
         await page.addInitScript(() => {
             Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
         });
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 0 });
 
         if (!Array.isArray(selectors) || selectors.length === 0) {
             await browser.close();
