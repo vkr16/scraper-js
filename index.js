@@ -51,20 +51,15 @@ app.get('/v2', async (req, res) => {
     }
 });
 
-const browser = await chromium.launch({
-    headless: HEADLESS,
-    executablePath: '/usr/bin/chromium-browser',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-});
-
-process.on('exit', async () => {
-    await browser.close();
-});
-
 async function loadPage({ url, selector }) {
     if (!url) throw new Error('url is required');
     if (!selector) throw new Error('selector is required');
 
+    const browser = await chromium.launch({
+        headless: HEADLESS,
+        executablePath: '/usr/bin/chromium-browser',
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
     try {
@@ -77,11 +72,11 @@ async function loadPage({ url, selector }) {
         const raw = await elHandle.evaluate(node => node.innerHTML, undefined, { timeout: 10000 });
         const value = parsePrice(raw);
 
-        await page.close();
+        await browser.close();
         return value;
     } catch (err) {
         if (LOG) console.log(err);
-        try { await page.close(); } catch (_) { }
+        try { await browser.close(); } catch (_) { }
         throw err;
     }
 }
