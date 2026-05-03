@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    // console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
 
 app.get('/v2', async (req, res) => {
@@ -27,7 +27,8 @@ app.get('/v2', async (req, res) => {
     try {
         const value = await loadPage({ url, selector });
         if (value === null || value === undefined) {
-            throw new Error('No result found or the result is empty');
+            console.log("Thrown error : No result found or the result is empty")
+	    throw new Error('No result found or the result is empty');
         }
 
         return res.json({
@@ -58,7 +59,13 @@ async function loadPage({ url, selector }) {
     const browser = await chromium.launch({
         headless: HEADLESS,
         executablePath: '/usr/bin/chromium-browser',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disk-cache-size=0',
+            '--media-cache-size=0',
+            '--disable-application-cache',
+            '--disable-cache',
+            '--incognito']
     });
     const page = await browser.newPage();
 
