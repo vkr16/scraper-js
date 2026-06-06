@@ -1,0 +1,35 @@
+services:
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scraper-api
+    ports:
+      - "3993:3030"
+
+    networks:
+      - private-net
+
+    volumes:
+      - ./src:/app/src
+
+    restart: "unless-stopped"
+
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+    shm_size: "1gb"
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    command: sh /app/src/entrypoint.sh
+
+networks:
+  private-net:
+    external: true
