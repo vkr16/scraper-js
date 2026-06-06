@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim
+FROM node:22-bookworm-slim AS scraper-api
 
 # Hindari interactive prompt saat install paket
 ENV DEBIAN_FRONTEND=noninteractive
