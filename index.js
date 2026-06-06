@@ -58,7 +58,7 @@ async function loadPage({ url, selector }) {
 
     const browser = await chromium.launch({
         headless: HEADLESS,
-        // executablePath: '/usr/bin/chromium-browser',
+        executablePath: '/usr/bin/chromium-browser',
         args: ['--no-sandbox', '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
             '--disk-cache-size=0',
