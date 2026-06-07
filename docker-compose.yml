@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: scraper-api
-    ports:
-      - "3993:3030"
+#    ports:
+#      - "3993:3030"
 
     networks:
       - private-net
